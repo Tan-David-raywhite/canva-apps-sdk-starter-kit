@@ -28,13 +28,30 @@ async function generateHash(message: string) {
   return hashHex;
 }
 
-const imageUrls = [
-  "https://cdn.pixabay.com/photo/2023/09/16/18/26/hummingbird-8257355_1280.jpg",
-  "https://cdn.pixabay.com/photo/2023/12/10/03/00/peacock-8440548_1280.jpg",
-  "https://cdn.pixabay.com/photo/2023/12/20/07/04/mountains-8459056_1280.jpg",
-  "https://cdn.pixabay.com/photo/2023/11/26/07/29/sparrow-8413000_1280.jpg",
-  "https://cdn.pixabay.com/photo/2023/12/12/16/11/mountain-8445543_1280.jpg",
+let imageUrls = [
+  "",
+  // "https://cdn.pixabay.com/photo/2023/09/16/18/26/hummingbird-8257355_1280.jpg",
+  // "https://cdn.pixabay.com/photo/2023/12/10/03/00/peacock-8440548_1280.jpg",
+  // "https://cdn.pixabay.com/photo/2023/12/20/07/04/mountains-8459056_1280.jpg",
+  // "https://cdn.pixabay.com/photo/2023/11/26/07/29/sparrow-8413000_1280.jpg",
+  // "https://cdn.pixabay.com/photo/2023/12/12/16/11/mountain-8445543_1280.jpg",
 ];
+
+
+async function getProperties() {
+  fetch('https://raywhiteapi.ep.dynamics.net/v1/listings/' + 3039871 + '?apiKey=EB24EFDE-739E-4A97-9B18-88349791D6D3', {
+    method: 'get', // or 'PUT'
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      result.data[0].value.images.map((item, index) => imageUrls.push(item.url))
+    })
+}
+
+getProperties();
 
 /**
  * This file contains routes for demonstrating the authentication demo
@@ -334,13 +351,13 @@ async function main() {
         Array.from(
           { length: 10 },
           async (_, i) =>
-            ({
-              id: await generateHash(i + ""),
-              containerType: "folder",
-              name: `My folder ${i}`,
-              type: "CONTAINER",
-            }) satisfies Container,
-        ),
+          ({
+            id: await generateHash(i + ""),
+            containerType: "folder",
+            name: `My folder ${i}`,
+            type: "CONTAINER",
+          } satisfies Container)
+        )
       );
 
       resources = resources.concat(containers);
