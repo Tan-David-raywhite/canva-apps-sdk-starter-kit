@@ -84,7 +84,7 @@ export const App = () => {
 
   if (state === "error") {
     return (
-      <div className={styles.scrollContainer}>
+      <div>
         <Text>
           <Text variant="bold" tagName="span">
             Something went wrong.
@@ -96,7 +96,7 @@ export const App = () => {
   }
 
   return (
-    <div className={styles.scrollContainer}>
+    <div>
       <Rows spacing="3u">
         <Text>
           This example demonstrates how apps can allow users to authenticate
