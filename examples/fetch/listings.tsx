@@ -278,7 +278,6 @@ const Listings = () => {
 
   return (
     <div>
-      <button onClick={handleClick}>upload image</button>
       <Rows spacing="2u">
         <SearchInputMenu placeholder="Search Listings..." onChange={value => searchListings(value)} onFocus={() => setIsSearchMenuOpen(true)} onClear={onSearchInputClear}>
           {listingSearchState === "success" && isSearchMenuOpen && <Menu >

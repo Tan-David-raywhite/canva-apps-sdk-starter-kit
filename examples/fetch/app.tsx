@@ -23,6 +23,7 @@ import { addNativeElement } from "@canva/design";
 import * as styles from "styles/components.css";
 
 import Listings from './listings'
+import Agents from './agents'
 
 // const BACKEND_URL = `${BACKEND_HOST}/custom-route`;
 const BACKEND_URL = "https://raywhiteapi.ep.dynamics.net/v1/listings/?apiKey=df83a96e-0f55-4a20-82d9-eaa5f3e30335";
@@ -44,24 +45,23 @@ export const App = () => {
       <Tabs>
         <Rows spacing="3u">
           <TabList>
-            <Tab id="Listings">
-              Listings
-            </Tab>
+
             <Tab id="Agents">
               Agents
+            </Tab>
+            <Tab id="Listings">
+              Listings
             </Tab>
             <Tab id="Offices">
               Offices
             </Tab>
           </TabList>
           <TabPanels>
+            <TabPanel id="Agents">
+              <Agents />
+            </TabPanel>
             <TabPanel id="Listings">
               <Listings />
-            </TabPanel>
-            <TabPanel id="Agents">
-              <Text>
-                Agents
-              </Text>
             </TabPanel>
             <TabPanel id="Offices">
               <Text>
