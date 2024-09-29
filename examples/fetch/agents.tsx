@@ -45,6 +45,39 @@ const Agents = () => {
       "id": 1,
       name: 'name',
       emailAddress: 'email@email.com',
+      phones: [
+        {
+          internationalizedNumber: "+61 422 193 423",
+          localNumber: "0422 193 423",
+          typeCode: "MOB",
+        }
+      ],
+      organisations: [
+        {
+          id: 721,
+          membershipId: 273255,
+          name: "Ray White Glenfield",
+          office3LACode: "GLF",
+          phones: [{
+            internationalizedNumber: "+64 21 024 10431",
+            localNumber: "021 024 10431",
+            typeCode: "MOB"
+          }],
+          priority: 22,
+          public: true,
+          roleTitle: "Sales - Salesperson",
+          roles: [{
+            application: "NurtureCloud",
+            applicationId: 46,
+            id: 35994,
+            role: "Agent",
+          }],
+          subTypeCode: "RWR",
+          title: "Licensee Salesperson",
+          typeCode: "RWO",
+          userName: "glenfield.nz",
+        }
+      ]
     }
   });
   const [listingSearchState, setListingSearchState] = useState<ListingSearchState>("idle");
@@ -134,7 +167,7 @@ const Agents = () => {
 
   return (
     <div>
-      <Rows spacing="2u">
+      <Rows spacing="1.5u">
         <SearchInputMenu placeholder="Search Agents..." onChange={value => searchListings(value)} onFocus={() => setIsSearchMenuOpen(true)} onClear={onSearchInputClear}>
           {listingSearchState === "success" && isSearchMenuOpen && <Menu >
             {agentMenuItems.map(item => <MenuItem onClick={() => onMenuItemClick(item)} key={item.value.id}>
@@ -145,29 +178,93 @@ const Agents = () => {
             )}
           </Menu>}
         </SearchInputMenu>
+        {/* {listingSearchState === "success" && selectedListing && ( */}
+        {(
+          <>
+            <TypographyCard
+              ariaLabel="Listing Title"
+              onClick={() => { onListingTextResultClick("Name", selectedListing.value) }}
+            >
+              <Text>
+                Name:<br />
+                {selectedListing.value.name}
+              </Text>
+            </TypographyCard>
+            <TypographyCard
+              ariaLabel="Listing Title"
+              onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
+            >
+              <Text>
+                Email:<br />
+                {selectedListing.value.emailAddress}
+              </Text>
+            </TypographyCard>
+            <TypographyCard
+              ariaLabel="Mobile number local"
+              onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
+            >
+              <Text>
+                Mobile number (local):<br />
+                {selectedListing.value.phones[0].localNumber}
+              </Text>
+            </TypographyCard>
+            <TypographyCard
+              ariaLabel="Mobile number international"
+              onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
+            >
+              <Text>
+                Mobile number (international):<br />
+                {selectedListing.value.phones[0].internationalizedNumber}
+              </Text>
+            </TypographyCard>
+            <Title>Office details</Title>
+            {
+              selectedListing.value.organisations.map(item => (
+                <>
+                  <TypographyCard
+                    ariaLabel="Office name"
+                    onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
+                  >
+                    <Text>
+                      Office name:<br />
+                      {item.name}
+                    </Text>
+                  </TypographyCard>
+                  <TypographyCard
+                    ariaLabel="Office Title"
+                    onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
+                  >
+                    <Text>
+                      Title:<br />
+                      {item.title}
+                    </Text>
+                  </TypographyCard>
+                  <TypographyCard
+                    ariaLabel="Mobile number local"
+                    onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
+                  >
+                    <Text>
+                      Mobile number (local):<br />
+                      {item.phones[0].localNumber}
+                    </Text>
+                  </TypographyCard>
+                  <TypographyCard
+                    ariaLabel="Mobile number international"
+                    onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
+                  >
+                    <Text>
+                      Mobile number (international):<br />
+                      {item.phones[0].internationalizedNumber}
+                    </Text>
+                  </TypographyCard>
+                </>
+              ))
+            }
+          </>
+
+        )}
+
       </Rows>
-      {listingSearchState === "success" && selectedListing && (
-        <Rows spacing="1u">
-          <TypographyCard
-            ariaLabel="Listing Title"
-            onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
-          >
-            <Text>
-              Name:<br />
-              {selectedListing.value.name}
-            </Text>
-          </TypographyCard>
-          <TypographyCard
-            ariaLabel="Listing Title"
-            onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
-          >
-            <Text>
-              Email:<br />
-              {selectedListing.value.emailAddress}
-            </Text>
-          </TypographyCard>
-        </Rows>
-      )}
 
     </div >
   );
