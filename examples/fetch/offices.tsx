@@ -19,11 +19,12 @@ import { useState, useEffect } from "react";
 import { addNativeElement } from "@canva/design";
 import * as styles from "styles/components.css";
 import { upload } from "@canva/asset";
+import { useSelection } from "utils/use_selection_hook";
 
 // const BACKEND_URL = `${BACKEND_HOST}/custom-route`;
 const BACKEND_URL = "https://raywhiteapi.ep.dynamics.net/v1/organisations/?apiKey=df83a96e-0f55-4a20-82d9-eaa5f3e30335";
-const BRANDTEMPLATEQUERY_URL = "https://api.canva.com/rest/v1/brand-templates/DAGQgbdLI-k/dataset";
-// const BRANDTEMPLATEQUERY_URL = "https://api.canva.com/rest/v1/oauth/token";
+// const BRANDTEMPLATEQUERY_URL = "https://api.canva.com/rest/v1/brand-templates/DAGQgbdLI-k/dataset";
+const BRANDTEMPLATEQUERY_URL = "https://api.canva.com/rest/v1/oauth/token";
 
 type State = "idle" | "loading" | "success" | "error";
 type ListingSearchState = "idle" | "loading" | "success" | "error";
@@ -145,7 +146,8 @@ const Agents = () => {
     }
   });
   const [listingSearchState, setListingSearchState] = useState<ListingSearchState>("idle");
-
+  // const currentSelection = useSelection("plaintext");
+  // console.log(currentSelection);
   const headerTextStyle = {
     fontSize: '15px'
   }
@@ -306,6 +308,7 @@ const Agents = () => {
               </AccordionItem>
               <AccordionItem title="Office socials">
                 {
+                   selectedListing.value.profile.socialLinks ?
                   selectedListing.value.profile.socialLinks.map(item =>
                     <TypographyCard
                       ariaLabel="Office socials"
@@ -319,6 +322,8 @@ const Agents = () => {
                       </Text>
                     </TypographyCard>
                   )
+                  :
+                  null
                 }
               </AccordionItem>
               <AccordionItem title="Office website">

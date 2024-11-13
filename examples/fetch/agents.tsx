@@ -126,16 +126,16 @@ const Agents = () => {
 
   const onListingTextResultClick = (text, data) => {
     switch (text) {
-      case 'Title':
+      case 'Name':
         addNativeElement({
           type: "TEXT",
-          children: [data.title]
+          children: [data.name]
         });
         break;
-      case 'Address':
+      case 'Email':
         addNativeElement({
           type: "TEXT",
-          children: [data.address.streetNumber + ' ' + data.address.streetName + ' ' + data.address.streetType + ' ' + data.address.suburb + ' ' + data.address.state + ' ' + data.address.postCode],
+          children: [data.emailAddress],
         });
         break;
       case 'Description':
@@ -182,7 +182,7 @@ const Agents = () => {
         {(
           <>
             <TypographyCard
-              ariaLabel="Listing Title"
+              ariaLabel="Agent Name"
               onClick={() => { onListingTextResultClick("Name", selectedListing.value) }}
             >
               <Text>
@@ -191,8 +191,8 @@ const Agents = () => {
               </Text>
             </TypographyCard>
             <TypographyCard
-              ariaLabel="Listing Title"
-              onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
+              ariaLabel="Agent Email"
+              onClick={() => { onListingTextResultClick("Email", selectedListing.value) }}
             >
               <Text>
                 Email:<br />

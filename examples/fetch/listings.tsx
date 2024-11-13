@@ -258,15 +258,15 @@ const Listings = () => {
     }
   };
 
-  async function handleClick() {
+  async function handleClick(url) {
     // Upload an image
     const result = await upload({
       type: "IMAGE",
       mimeType: "image/jpeg",
-      url: "https://www.canva.dev/example-assets/image-import/image.jpg",
-      thumbnailUrl:
-        "https://www.canva.dev/example-assets/image-import/thumbnail.jpg",
+      url: "https://cdn6.ep.dynamics.net/s3/rw-propertyimages/bb6c-H3160410-115789557__1728959146-160125-624OceanAveDoubleBay03.jpg",
+      thumbnailUrl: "https://cdn6.ep.dynamics.net/s3/rw-propertyimages/bb6c-H3160410-115789557__1728959146-160125-624OceanAveDoubleBay03.jpg",
     });
+    console.log(result)
 
     // Add the image to the design
     await addNativeElement({
@@ -299,6 +299,7 @@ const Listings = () => {
                 <EmbedCard key={item.url}
                   ariaLabel="Listing Image"
                   onClick={() => {
+                    // handleClick(item.url)
                     addNativeElement({
                       type: "EMBED",
                       url: item.url,
