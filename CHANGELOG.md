@@ -1,5 +1,176 @@
 # Changelog
 
+## 2024-11-13
+
+### 🧰 Added
+
+- Added tests for the `TableWrapper` sdk, `utils/tests/table_wrapper.tests.ts`.
+- `eslint`
+
+  - Added arguments to formatjs eslint rules to require string literals for defaultMessage and description.
+    Having variables for defaultMessage and description should not be used because it means formatjs can't generate message ids, and can't extract messages.
+
+    ```jsx
+    // ❌ Not recommended, messages cannot be extracted, and cannot have ids auto-generated.
+    <FormattedMessage defaultMessage={myMessage} .../>
+    //                               ~~~~~~~~~~~
+    // error: "defaultMessage" must be:
+    // - a string literal or
+    // - template literal without variable  eslintformatjs/enforce-default-message
+
+    // ✅ Recommended, messages can be extracted, and have ids auto-generated.
+    <FormattedMessage defaultMessage="My static message" description="My static description"/>
+    ```
+
+    NOTE: If your `FormattedMessage` text should change based on the value of some data,
+    see [this docs section for an example](https://www.canva.dev/docs/apps/localization/#preferred-frontend-localization).
+
+### 🐞 Fixed
+
+- Update `package.json` extract script to use a better file path pattern (`\"src/**/*.{ts,tsx}\"`). The previous path pattern (`src/**/*.{ts,tsx}`) would miss some files.
+
+### 🔧 Changed
+
+- Dependencies audit bringing modules up to date:
+
+```text
+  @canva/design                             2.1.0   →    2.2.1
+  @eslint/js                               9.12.0   →   9.14.0
+  @formatjs/cli                            6.2.12   →    6.3.8
+  @formatjs/ts-transformer                3.13.14   →  3.13.22
+  @types/jest                             29.5.13   →  29.5.14
+  @types/react                            18.3.11   →  18.3.12
+  @typescript-eslint/eslint-plugin          8.9.0   →   8.13.0
+  @typescript-eslint/parser                 8.9.0   →   8.13.0
+  eslint                                   9.12.0   →   9.14.0
+  eslint-plugin-formatjs                    5.0.0   →    5.2.2
+  eslint-plugin-jest                       28.8.3   →   28.9.0
+  eslint-plugin-react                      7.37.1   →   7.37.2
+  globals                                 15.11.0   →  15.12.0
+  mini-css-extract-plugin                   2.9.1   →    2.9.2
+  ts-jest                                  29.2.4   →   29.2.5
+  webpack                                  5.95.0   →   5.96.1
+```
+
+- `@canva/app-ui-kit`
+  - Upgraded `app-ui-kit` to version `4.3.0`. Please see the [changelog](https://www.canva.dev/docs/apps/app-ui-kit/changelog/) for the list of changes.
+  - Updated snapshots in `examples/ui_test`.
+
+## 2024-10-30
+
+### 🔧 Changed
+
+- `@canva/app-ui-kit`
+  - Upgraded `app-ui-kit` to version `4.2.0`. Please see the [changelog](https://www.canva.dev/docs/apps/app-ui-kit/changelog/) for the list of changes.
+
+## 2024-10-22
+
+### 🧰 Added
+
+- `examples`
+  - Added an example to demonstrate [adding videos](https://www.canva.dev/docs/apps/creating-videos/) in `examples/video_elements`.
+  - Added an example to demonstrate [adding an app-controlled videos](https://www.canva.dev/docs/apps/creating-app-elements/) in `examples/app_video_elements`.
+- Added a `.prettierrc` config file to introduce some consistency across the Starter Kit repo, for developers who have forked this repo for their own projects are welcome to adjust to their own liking and preferences.
+- `eslint`
+
+  - Added arguments to the `formatjs/no-literal-string-in-jsx` rule to include App UI Kit props that should be localized (e.g. ariaLabel now is highlighted if developers are not using the recommend `react-intl` messaging pattern).
+
+    ```jsx
+    // ❌ Not recommended, messages will not be localized.
+    <Button ariaLabel="Click me">..</Button>
+    //      ~~~~~~~~~~~~~~~~~~~~
+    // error: Cannot have untranslated text in JSX eslintformatjs/no-literal-string-in-jsx
+
+
+    // ✅ Recommended, messages will be localized.
+    const intl = useIntl();
+    <Button .. ariaLabel={intl.formatMessage({..})} >..</Button>
+    ```
+
+  - Added a new rule to lint against inlining large assets, such as videos, images or audio in apps, which leads to larger and slower apps.
+
+### 🐞 Fixed
+
+- Fixed an issue where running `npm start` on an Ubuntu system would result in `Error: Cannot find module '@ngrok/ngrok-linux-x64-gnu`.
+- Fixed an issue where running `npm run extract` on Windows systems would generate an empty `messages_en.json` ([Github issue](https://github.com/formatjs/formatjs/issues/3854)).
+
+### 🔧 Changed
+
+- `@canva/app-i18n-kit`
+  - Upgraded `app-i18n-kit` to version `1.0.0`.
+- `@canva/app-ui-kit`
+  - Upgraded `app-ui-kit` to version `4.1.0`. Please see the [changelog](https://www.canva.dev/docs/apps/app-ui-kit/changelog/) for the list of changes.
+- Added instructions to the [README](README.md) for running an example.
+- Dependencies audit, upgrading all modules where possible:
+
+  ```text
+  @eslint/js                                9.9.0   →   9.12.0
+  @testing-library/react                   16.0.0   →   16.0.1
+  @types/jest                             29.5.12   →  29.5.13
+  @types/jsonwebtoken                       9.0.6   →    9.0.7
+  @types/react                             18.3.4   →  18.3.11
+  @types/react-dom                         18.0.11  →   18.3.1
+  @typescript-eslint/eslint-plugin          8.2.0   →    8.9.0
+  @typescript-eslint/parser                 8.2.0   →    8.9.0
+  cssnano                                   7.0.5   →    7.0.6
+  debug                                     4.3.6   →    4.3.7
+  eslint                                   8.57.1   →   9.12.0
+  eslint-plugin-formatjs                   4.13.3   →    5.0.0
+  eslint-plugin-jest                       28.8.0   →   28.8.3
+  eslint-plugin-react                      7.35.0   →   7.37.1
+  express                                  4.21.0   →   4.21.1
+  globals                                  15.9.0   →  15.11.0
+  ts-jest                                  29.2.4   →   29.2.5
+  webpack                                  5.94.0   →   5.95.0
+  webpack-dev-server                        5.0.4   →    5.1.0
+  ```
+
+- Moved `.env` to a `.env.template` and added to the `.gitignore`, a postinstall script now copies this locally.
+- Other minor improvements, cleanup and fixes of stale config.
+
+## 2024-09-25
+
+### 🔨 Breaking changes
+
+- Upgraded Apps SDK dependencies to v2.0.0 (design 2.1.0)
+
+### 🧰 Added
+
+- Updated the starter kit with internationalization tooling including `react-intl` and `formatjs`.
+  See the docs on the [Canva app localization process](https://www.canva.dev/docs/apps/localization/) to learn more.
+- Added [/examples/i18n](/examples/i18n) to demonstrate how to internationalize your app using `react-intl`
+- Added [/examples/i18n/tests](/examples/i18n/tests) to demonstrate how to unit test an app using localization
+- Added `.vscode` recommended extensions, helps to enforce eslint rules more uniformly by default.
+- Added `.pr-train.yml` to `.gitignore`
+- Added `use_feature_support` utils.
+- Added [/examples/feature_support](/examples/feature_support) to demonstrate usage of the Feature Support API.
+- Added `use_add_element` hook utils
+- `@canva/design@beta`
+  - Added `openDesign` method, which allows apps to read the current page of the user's design. To learn more, see [Design Editing](https://canva.dev/docs/apps/traversal).
+- Added a new example [/examples/design_editing](/examples/design_editing) to demonstrate how to use the Design Editing API.
+
+### 🔧 Changed
+
+- Added `alt` attributes where they were missing from `ImageCard` usage in examples.
+- `examples`
+  - Update `dnd` example apps to use feature supports to ensure they work correctly in different design types.
+  - Change TableWrapper and `native_table_element` example to work with new Table API.
+  - Updated @canva/asset examples to be compatible with 2.0.
+  - Update relevant example apps to:
+    - use new lowercase element type as part of upgraded `@canva/design` to version `2.0.0`.
+    - use `altText`
+    - use `use_add_element` hook to ensure they work correctly in different design types.
+  - Drop all `native_*` prefix from example apps' name.
+- `@canva/app-ui-kit`
+  - Upgraded `app-ui-kit` to version `4.0.0`. Please see the [changelog](https://www.canva.dev/docs/apps/app-ui-kit/changelog/) for the list of changes.
+- Upgraded `express` to `4.21.0`.
+- Update manual authentication example to use OAuth
+- Temporarily downgraded `eslint` to version `8.57.0` while formatjs lint rules are updated to be made compatible with v9.
+
+### 🗑️ Removed
+
+- Removed authentication from `examples/digital_asset_management` pending migration to `auth.requestAuthorization`.
+
 ## 2024-08-27
 
 ### 🔨 Breaking changes
@@ -31,6 +202,7 @@
   - Upgraded `app-ui-kit` to version `3.8.0`. Please see the [changelog](https://www.canva.dev/docs/apps/app-ui-kit/changelog/) for the list of changes.
 - Updated the `typescript` package to version `5.5.4` and adjusted tsconfig to suit. [See the release notes](https://devblogs.microsoft.com/typescript/announcing-typescript-5-5/).
 - Dependencies audit, upgrading all modules where possible and locking versions to ensure future stability:
+
   ```text
     @eslint/js                          ^9.6.0  →  9.9.0
     @ngrok/ngrok                        ^1.1.0  →  1.4.1
@@ -77,6 +249,7 @@
     webpack-dev-server                 ^4.10.0  →  5.0.4
     yargs                              ^17.5.1  →  17.7.2
   ```
+
 - Migrating eslint config to the new `9.9.0` flat config format, after doing so additional lint rule disabling was needed in a few places.
 - Moved `utils/table_wrapper.ts` closer to example referencing it, given it's still in preview.
 - Dependencies audit to all workspaces/examples, upgrading all modules where possible and locking versions to ensure future stability:
@@ -106,11 +279,15 @@
 ### 🗑️ Removed
 
 - `@canva/preview`:
+
   - Removed `/sdk/preview`, as all of our preview SDKs are now published to NPM with an `@beta` tag. e.g. to install the preview `@canva/design` SDK, run the following command
-    ```
+
+    ```bash
     npm install @canva/design@beta
     ```
+
   - Note that not every SDK is guaranteed to have a preview version released.
+
 - `@canva/preview/data`:
   - The Preview Data APIs have been removed, and are no longer available as a preview SDK.
   - The `data_provider_basic` and `data_provider_options` examples have also been removed.
@@ -508,8 +685,10 @@
     - [@canva/user](https://www.npmjs.com/package/@canva/user)
   - Dependencies in [package.json](./package.json) were changed to use the NPM registry accordingly.
 - Updated node version in [.nvmrc](.nvmrc) to LTS version of [v20.10.0](https://nodejs.org/en/blog/release/v20.10.0)
+
   - Run the below command at the repo root to upgrade via [nvm](https://github.com/nvm-sh/nvm#intro)
-    ```
+
+    ```bash
     nvm install
     ```
 

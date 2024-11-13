@@ -1,11 +1,8 @@
-.idea
-.vscode
-.ssl
-node_modules
 .DS_Store
-yarn-error.log
-dist
-secrets.json
+.env
+.idea
+.ssl
+*.log*
 **/*/db.json
-.env
-.env
+dist
+node_modules
