@@ -14,7 +14,7 @@ import {
 } from "@canva/app-ui-kit";
 import { auth } from "@canva/user";
 import { useState } from "react";
-import { addNativeElement } from "@canva/design";
+import { addElementAtPoint } from "@canva/design";
 import * as styles from "styles/components.css";
 import { upload } from "@canva/asset";
 
@@ -127,38 +127,38 @@ const Agents = () => {
   const onListingTextResultClick = (text, data) => {
     switch (text) {
       case 'Name':
-        addNativeElement({
-          type: "TEXT",
+        addElementAtPoint({
+          type: "text",
           children: [data.name]
         });
         break;
       case 'Email':
-        addNativeElement({
-          type: "TEXT",
+        addElementAtPoint({
+          type: "text",
           children: [data.emailAddress],
         });
         break;
       case 'Description':
-        addNativeElement({
-          type: "TEXT",
+        addElementAtPoint({
+          type: "text",
           children: [data.description],
         });
         break;
       case 'Price':
-        addNativeElement({
-          type: "TEXT",
+        addElementAtPoint({
+          type: "text",
           children: [data.price],
         });
         break;
       case 'Type':
-        addNativeElement({
-          type: "TEXT",
+        addElementAtPoint({
+          type: "text",
           children: [data.type],
         });
         break;
       default: {
-        addNativeElement({
-          type: "TEXT",
+        addElementAtPoint({
+          type: "text",
           children: [data.streetNumber + ' ' + data.streetName + ' ' + data.streetType + ' ' + data.suburb + ' ' + data.state + ' ' + data.postCode],
         });
       }
@@ -199,7 +199,7 @@ const Agents = () => {
                 {selectedListing.value.emailAddress}
               </Text>
             </TypographyCard>
-            <TypographyCard
+            {/* <TypographyCard
               ariaLabel="Mobile number local"
               onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
             >
@@ -259,7 +259,7 @@ const Agents = () => {
                   </TypographyCard>
                 </>
               ))
-            }
+            } */}
           </>
 
         )}
