@@ -27,7 +27,10 @@ const BRANDTEMPLATEQUERY_URL = "https://api.canva.com/rest/v1/oauth/token";
 
 type State = "idle" | "loading" | "success" | "error";
 type ListingSearchState = "idle" | "loading" | "success" | "error";
-
+type FieldsDef = {
+  name: string;
+  value: string;
+};
 const Listings = () => {
   const [state, setState] = useState<State>("idle");
   const [brandQueryState, setBrandQUeryState] = useState<State>("idle");
@@ -131,6 +134,8 @@ const Listings = () => {
   const [listingSearchState, setListingSearchState] =
     useState<ListingSearchState>("idle");
 
+  const [currentFields, setCurrentFields] = useState<FieldsDef>();
+
   const headerTextStyle = {
     fontSize: "15px",
   };
@@ -148,40 +153,69 @@ const Listings = () => {
       async (draft) => {
         // Loop through each content item
 
+        let fieldsArray = [];
+
         for (const content of draft.contents) {
           // Get the richtext content as plaintext
           const plaintext = content.readPlaintext();
           console.log(plaintext);
+
+          let fieldObject = {
+            name: plaintext,
+            value: "",
+          };
+          fieldsArray.push(fieldObject);
           // replace text with data
-
-          // content.replaceText(
-          //   { index: 0, length: plaintext.length },
-
-          //   data.streetNumber +
-          //     " " +
-          //     data.streetName +
-          //     " " +
-          //     data.streetType +
-          //     " " +
-          //     data.suburb +
-          //     " " +
-          //     data.state +
-          //     " " +
-          //     data.postCode,
-          //   {
-          //     fontWeight: "normal",
-          //   },
-          // );
-
-          // content.formatParagraph(
-          //   { index: 0, length: plaintext.length },
-          //   { fontWeight: "normal" },
-          // );
         }
         // Sync the content so that it's reflected in the design
-        await draft.sync();
+        await setCurrentFields(fieldsArray);
       },
     );
+  };
+  const replaceContent = async (data) => {
+    console.log(currentFields);
+    // await readContent(
+    //   {
+    //     contentType: "richtext",
+    //     context: "current_page",
+    //   },
+    //   async (draft) => {
+    //     // Loop through each content item
+
+    //     for (const content of draft.contents) {
+    //       // Get the richtext content as plaintext
+    //       const plaintext = content.readPlaintext();
+    //       console.log(plaintext);
+    //       // replace text with data
+
+    //       if (plaintext === "LISTING_ADDRESS") {
+    //         content.replaceText(
+    //           { index: 0, length: plaintext.length },
+    //           data.streetNumber +
+    //             " " +
+    //             data.streetName +
+    //             " " +
+    //             data.streetType +
+    //             " " +
+    //             data.suburb +
+    //             " " +
+    //             data.state +
+    //             " " +
+    //             data.postCode,
+    //           {
+    //             fontWeight: "normal",
+    //           },
+    //         );
+    //         content.formatParagraph(
+    //           { index: 0, length: plaintext.length },
+    //           { fontWeight: "normal" },
+    //         );
+    //       }
+    //     }
+    //     // Sync the content so that it's reflected in the design
+    //     await draft.sync();
+    //   },
+    // );
   };
 
   const onSearchInputClear = () => {
@@ -351,7 +385,7 @@ const Listings = () => {
             ariaLabel="Listing Address"
             onClick={() => {
               // onListingTextResultClick("Address", selectedListing.value);
-              // replaceContent(selectedListing.value.address);
+              replaceContent(selectedListing.value.address);
             }}
           >
             <Text>
