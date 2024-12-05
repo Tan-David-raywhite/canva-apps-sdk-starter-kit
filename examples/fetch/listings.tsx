@@ -27,10 +27,6 @@ const BRANDTEMPLATEQUERY_URL = "https://api.canva.com/rest/v1/oauth/token";
 
 type State = "idle" | "loading" | "success" | "error";
 type ListingSearchState = "idle" | "loading" | "success" | "error";
-type FieldsDef = {
-  name: string;
-  value: string;
-};
 const Listings = () => {
   const [state, setState] = useState<State>("idle");
   const [brandQueryState, setBrandQUeryState] = useState<State>("idle");
@@ -134,7 +130,7 @@ const Listings = () => {
   const [listingSearchState, setListingSearchState] =
     useState<ListingSearchState>("idle");
 
-  const [currentFields, setCurrentFields] = useState<FieldsDef>();
+  const [currentFields, setCurrentFields] = useState([]);
 
   const headerTextStyle = {
     fontSize: "15px",
@@ -162,60 +158,59 @@ const Listings = () => {
 
           let fieldObject = {
             name: plaintext,
-            value: "",
+            value: plaintext,
           };
           fieldsArray.push(fieldObject);
           // replace text with data
         }
         // Sync the content so that it's reflected in the design
+        console.log("initial fields", fieldsArray);
         await setCurrentFields(fieldsArray);
       },
     );
   };
-  const replaceContent = async (data) => {
+  const replaceContent = async (fieldType, fieldData) => {
     console.log(currentFields);
-    // await readContent(
-    //   {
-    //     contentType: "richtext",
-    //     context: "current_page",
-    //   },
-    //   async (draft) => {
-    //     // Loop through each content item
 
-    //     for (const content of draft.contents) {
-    //       // Get the richtext content as plaintext
-    //       const plaintext = content.readPlaintext();
-    //       console.log(plaintext);
-    //       // replace text with data
+    var res = currentFields.find((x) => x.name === fieldType);
+    console.log("Grabbed object", res);
+    await readContent(
+      {
+        contentType: "richtext",
+        context: "current_page",
+      },
+      async (draft) => {
+        // Loop through each content item
 
-    //       if (plaintext === "LISTING_ADDRESS") {
-    //         content.replaceText(
-    //           { index: 0, length: plaintext.length },
-    //           data.streetNumber +
-    //             " " +
-    //             data.streetName +
-    //             " " +
-    //             data.streetType +
-    //             " " +
-    //             data.suburb +
-    //             " " +
-    //             data.state +
-    //             " " +
-    //             data.postCode,
-    //           {
-    //             fontWeight: "normal",
-    //           },
-    //         );
-    //         content.formatParagraph(
-    //           { index: 0, length: plaintext.length },
-    //           { fontWeight: "normal" },
-    //         );
-    //       }
-    //     }
-    //     // Sync the content so that it's reflected in the design
-    //     await draft.sync();
-    //   },
-    // );
+        for (const content of draft.contents) {
+          // Get the richtext content as plaintext
+          const plaintext = content.readPlaintext();
+          // replace text with data
+
+          if (plaintext === res.value) {
+            content.replaceText(
+              { index: 0, length: plaintext.length },
+              fieldData,
+              {
+                fontWeight: "normal",
+              },
+            );
+            content.formatParagraph(
+              { index: 0, length: plaintext.length },
+              { fontWeight: "normal" },
+            );
+          }
+        }
+        // Sync the content so that it's reflected in the design
+        await draft.sync();
+        // update object
+        const objIndex = currentFields.findIndex(
+          (obj) => obj.name === fieldType,
+        );
+        currentFields[objIndex].value = fieldData;
+        console.log("new object", currentFields);
+      },
+    );
   };
 
   const onSearchInputClear = () => {
@@ -245,7 +240,7 @@ const Listings = () => {
       // console.log(body.data)
       setListingSearchState("success");
     } catch (error) {
-      setListingSearchState("error");
+      setListingSearchState("loading");
       // eslint-disable-next-line no-console
       console.error(error);
     }
@@ -333,18 +328,23 @@ const Listings = () => {
         >
           {listingSearchState === "success" && isSearchMenuOpen && (
             <Menu>
-              {listingMenuItems.map((item) => (
-                <MenuItem
-                  onClick={() => onMenuItemClick(item)}
-                  key={item.value.id}
-                >
-                  <div style={headerTextStyle}>
-                    {item.value.address.streetNumber}{" "}
-                    {item.value.address.streetName}{" "}
-                    {item.value.address.streetType} {item.value.address.suburb}
-                  </div>
-                </MenuItem>
-              ))}
+              {listingMenuItems ? (
+                listingMenuItems.map((item) => (
+                  <MenuItem
+                    onClick={() => onMenuItemClick(item)}
+                    key={item.value.id}
+                  >
+                    <div style={headerTextStyle}>
+                      {item.value.address.streetNumber}{" "}
+                      {item.value.address.streetName}{" "}
+                      {item.value.address.streetType}{" "}
+                      {item.value.address.suburb}
+                    </div>
+                  </MenuItem>
+                ))
+              ) : (
+                <></>
+              )}
             </Menu>
           )}
         </SearchInputMenu>
@@ -372,7 +372,10 @@ const Listings = () => {
           <TypographyCard
             ariaLabel="Listing Title"
             onClick={() => {
-              onListingTextResultClick("Title", selectedListing.value);
+              replaceContent(
+                "LISTING_TITLE",
+                selectedListing.value.title,
+              );
             }}
           >
             <Text>
@@ -385,7 +388,15 @@ const Listings = () => {
             ariaLabel="Listing Address"
             onClick={() => {
               // onListingTextResultClick("Address", selectedListing.value);
-              replaceContent(selectedListing.value.address);
+              replaceContent(
+                "LISTING_ADDRESS",
+                selectedListing.value.address.streetNumber +
+                  selectedListing.value.address.streetName +
+                  selectedListing.value.address.streetType +
+                  selectedListing.value.address.suburb +
+                  selectedListing.value.address.state +
+                  selectedListing.value.address.postCode,
+              );
             }}
           >
             <Text>
@@ -400,39 +411,15 @@ const Listings = () => {
             </Text>
           </TypographyCard>
           <TypographyCard
-            ariaLabel="Listing Description"
-            onClick={() => {
-              onListingTextResultClick("Description", selectedListing.value);
-            }}
-          >
-            <Text lineClamp={3}>
-              Description:
-              <br />
-              {selectedListing.value.description}
-            </Text>
-          </TypographyCard>
-          <TypographyCard
             ariaLabel="Listing Price"
             onClick={() => {
-              onListingTextResultClick("Price", selectedListing.value);
+              replaceContent("LISTING_PRICE", "$" + selectedListing.value.price);
             }}
           >
             <Text>
               Price:
               <br />
               {selectedListing.value.price}
-            </Text>
-          </TypographyCard>
-          <TypographyCard
-            ariaLabel="Listing Type"
-            onClick={() => {
-              onListingTextResultClick("Type", selectedListing.value);
-            }}
-          >
-            <Text>
-              Type:
-              <br />
-              {selectedListing.value.type}
             </Text>
           </TypographyCard>
         </Rows>
