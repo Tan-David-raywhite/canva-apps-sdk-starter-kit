@@ -15,7 +15,7 @@ import {
 import { auth } from "@canva/user";
 import { useState, useEffect } from "react";
 import { addElementAtPoint } from "@canva/design";
-import { readContent } from "@canva/design";
+import { editContent } from "@canva/design";
 import * as styles from "styles/components.css";
 import { upload } from "@canva/asset";
 

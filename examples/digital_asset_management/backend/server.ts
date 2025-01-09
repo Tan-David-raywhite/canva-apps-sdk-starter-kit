@@ -1,9 +1,8 @@
-import "dotenv/config";
-import * as cookieParser from "cookie-parser";
-import * as crypto from "crypto";
 import * as express from "express";
 import * as cors from "cors";
+import { createDamRouter } from "./routers/dam";
 import { createBaseServer } from "../../../utils/backend/base_backend/create";
+<<<<<<< HEAD
 import { createJwtMiddleware } from "../../../utils/backend/jwt_middleware";
 import type {
   Container,
@@ -53,10 +52,13 @@ getProperties();
 /**
  * This file contains routes needed for a DAM content app.
  */
+=======
+>>>>>>> upstream/main
 
 async function main() {
-  // add your CANVA_APP_ID to the .env file at the root level
+  // TODO: Set the CANVA_APP_ID environment variable in the project's .env file
   const APP_ID = process.env.CANVA_APP_ID;
+
   if (!APP_ID) {
     throw new Error(
       `The CANVA_APP_ID environment variable is undefined. Set the variable in the project's .env file.`,
@@ -96,14 +98,9 @@ async function main() {
   router.use(cors());
 
   /**
-   * The `cookieParser` middleware allows the routes to read and write cookies.
-   *
-   * By passing a value into the middleware, we enable the "signed cookies" feature of Express.js. The
-   * value should be static and cryptographically generated. If it's dynamic (as shown below), cookies
-   * won't persist between server restarts.
-   *
-   * TODO: Replace `crypto.randomUUID()` with a static value, loaded via an environment variable.
+   * Add routes for digital asset management.
    */
+<<<<<<< HEAD
   router.use(cookieParser(crypto.randomUUID()));
 
   /**
@@ -167,6 +164,10 @@ async function main() {
       continuation: +(findResourcesRequest.continuation || 0) + 1,
     });
   });
+=======
+  const damRouter = createDamRouter();
+  router.use(damRouter);
+>>>>>>> upstream/main
 
   const server = createBaseServer(router);
   server.start(process.env.CANVA_BACKEND_PORT);
