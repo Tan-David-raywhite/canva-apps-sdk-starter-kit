@@ -141,10 +141,10 @@ const Listings = () => {
   }, []);
 
   const checkContent = async () => {
-    await readContent(
+    await editContent(
       {
         contentType: "richtext",
-        context: "current_page",
+        target: "current_page",
       },
       async (draft) => {
         // Loop through each content item
@@ -174,10 +174,10 @@ const Listings = () => {
 
     var res = currentFields.find((x) => x.name === fieldType);
     console.log("Grabbed object", res);
-    await readContent(
+    await editContent(
       {
         contentType: "richtext",
-        context: "current_page",
+        target: "current_page",
       },
       async (draft) => {
         // Loop through each content item
