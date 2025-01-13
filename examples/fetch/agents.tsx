@@ -1,4 +1,6 @@
 import {
+  Accordion,
+  AccordionItem,
   Button,
   Carousel,
   EmbedCard,
@@ -14,7 +16,9 @@ import {
 } from "@canva/app-ui-kit";
 import { auth } from "@canva/user";
 import { useState } from "react";
-import { addElementAtPoint } from "@canva/design";
+import { addElementAtCursor, addElementAtPoint, ui } from "@canva/design";
+import { editContent } from "@canva/design";
+import { useFeatureSupport } from "utils/use_feature_support";
 import * as styles from "styles/components.css";
 import { upload } from "@canva/asset";
 
@@ -27,6 +31,7 @@ type State = "idle" | "loading" | "success" | "error";
 type ListingSearchState = "idle" | "loading" | "success" | "error";
 
 const Agents = () => {
+  const isSupported = useFeatureSupport();
   const [state, setState] = useState<State>("idle");
   const [brandQueryState, setBrandQUeryState] = useState<State>("idle");
   const [responseBody, setResponseBody] = useState<unknown | undefined>(
@@ -40,46 +45,7 @@ const Agents = () => {
   }])
   const [searchInputValue, setSearchInputValue] = useState<string>("");
   const [isSearchMenuOpen, setIsSearchMenuOpen] = useState(false);
-  const [selectedListing, setSelectedListing] = useState({
-    "value": {
-      "id": 1,
-      name: 'name',
-      emailAddress: 'email@email.com',
-      phones: [
-        {
-          internationalizedNumber: "+61 422 193 423",
-          localNumber: "0422 193 423",
-          typeCode: "MOB",
-        }
-      ],
-      organisations: [
-        {
-          id: 721,
-          membershipId: 273255,
-          name: "Ray White Glenfield",
-          office3LACode: "GLF",
-          phones: [{
-            internationalizedNumber: "+64 21 024 10431",
-            localNumber: "021 024 10431",
-            typeCode: "MOB"
-          }],
-          priority: 22,
-          public: true,
-          roleTitle: "Sales - Salesperson",
-          roles: [{
-            application: "NurtureCloud",
-            applicationId: 46,
-            id: 35994,
-            role: "Agent",
-          }],
-          subTypeCode: "RWR",
-          title: "Licensee Salesperson",
-          typeCode: "RWO",
-          userName: "glenfield.nz",
-        }
-      ]
-    }
-  });
+  const [selectedAgent, setselectedAgent] = useState({});
   const [listingSearchState, setListingSearchState] = useState<ListingSearchState>("idle");
 
   const headerTextStyle = {
@@ -109,10 +75,10 @@ const Agents = () => {
       const body = await res.json();
       setResponseBody(body.data);
       setAgentMenuItems(body.data);
-      console.log(body.data)
+      // console.log(body.data)
       setListingSearchState("success");
     } catch (error) {
-      setListingSearchState("error");
+      setListingSearchState("loading");
       // eslint-disable-next-line no-console
       console.error(error);
     }
@@ -120,8 +86,127 @@ const Agents = () => {
 
   const onMenuItemClick = (item) => {
     console.log(item)
-    setSelectedListing(item)
+    setselectedAgent(item)
     setIsSearchMenuOpen(false)
+  }
+
+  function handleDragStartText(event: React.DragEvent<HTMLElement>) {
+    if (isSupported(ui.startDragToPoint)) {
+      console.log(event)
+      ui.startDragToPoint(event, {
+        type: "text",
+        children: [event.target.ariaLabel],
+      });
+    }
+
+    if (isSupported(ui.startDragToCursor)) {
+      ui.startDragToCursor(event, {
+        type: "text",
+        children: [event.target.ariaLabel],
+      });
+    }
+  }
+
+  async function handleImageClick(event) {
+    if (isSupported(addElementAtPoint)) {
+      const asset = await upload({
+        mimeType: "image/jpeg",
+        thumbnailUrl:
+          event.target.ariaLabel,
+        type: "image",
+        url: event.target.ariaLabel,
+        width: 320,
+        height: 212,
+        aiDisclosure: "none",
+      });
+
+      addElementAtPoint({
+        type: "image",
+        ref: asset.ref,
+        altText: {
+          text: "Example grass image",
+          decorative: false
+        },
+      });
+    }
+
+    if (isSupported(addElementAtCursor)) {
+      const asset = await upload({
+        mimeType: "image/jpeg",
+        thumbnailUrl:
+          event.target.ariaLabel,
+        type: "image",
+        url: event.target.ariaLabel,
+        width: 320,
+        height: 212,
+        aiDisclosure: "none",
+      });
+
+      addElementAtCursor({
+        type: "image",
+        ref: asset.ref,
+        altText: {
+          text: "Example grass image",
+          decorative: false
+        },
+      });
+    }
+  }
+
+  function handleImageDragStart(event: React.DragEvent<HTMLElement>) {
+    if (isSupported(ui.startDragToPoint)) {
+      ui.startDragToPoint(event, {
+        type: "image",
+        resolveImageRef: () => {
+          return upload({
+            mimeType: "image/jpeg",
+            thumbnailUrl:
+              event.target.ariaLabel,
+            type: "image",
+            url: event.target.ariaLabel,
+            width: 320,
+            height: 212,
+            aiDisclosure: "none",
+          });
+        },
+        previewUrl:
+          event.target.ariaLabel,
+        previewSize: {
+          width: 320,
+          height: 212,
+        },
+        fullSize: {
+          width: 320,
+          height: 212,
+        },
+      });
+    }
+
+    if (isSupported(ui.startDragToCursor)) {
+      ui.startDragToCursor(event, {
+        type: "image",
+        resolveImageRef: () => {
+          return upload({
+            mimeType: "image/jpeg",
+            thumbnailUrl: event.target.ariaLabel,
+            type: "image",
+            url: event.target.ariaLabel,
+            width: 320,
+            height: 212,
+            aiDisclosure: "none",
+          });
+        },
+        previewUrl: event.target.ariaLabel,
+        previewSize: {
+          width: 320,
+          height: 212,
+        },
+        fullSize: {
+          width: 320,
+          height: 212,
+        },
+      });
+    }
   }
 
   const onListingTextResultClick = (text, data) => {
@@ -165,6 +250,109 @@ const Agents = () => {
     }
   };
 
+
+  async function handlePNGImageClick(event) {
+    if (isSupported(addElementAtPoint)) {
+      const asset = await upload({
+        mimeType: "image/png",
+        thumbnailUrl:
+          event.target.ariaLabel,
+        type: "image",
+        url: event.target.ariaLabel,
+        width: 320,
+        height: 212,
+        aiDisclosure: "none",
+      });
+
+      addElementAtPoint({
+        type: "image",
+        ref: asset.ref,
+        altText: {
+          text: "Example grass image",
+          decorative: false
+        },
+      });
+    }
+
+    if (isSupported(addElementAtCursor)) {
+      const asset = await upload({
+        mimeType: "image/png",
+        thumbnailUrl:
+          event.target.ariaLabel,
+        type: "image",
+        url: event.target.ariaLabel,
+        width: 320,
+        height: 212,
+        aiDisclosure: "none",
+      });
+
+      addElementAtCursor({
+        type: "image",
+        ref: asset.ref,
+        altText: {
+          text: "Example grass image",
+          decorative: false
+        },
+      });
+    }
+  }
+
+  function handlePNGImageDragStart(event: React.DragEvent<HTMLElement>) {
+    if (isSupported(ui.startDragToPoint)) {
+      ui.startDragToPoint(event, {
+        type: "image",
+        resolveImageRef: () => {
+          return upload({
+            mimeType: "image/png",
+            thumbnailUrl:
+              event.target.ariaLabel,
+            type: "image",
+            url: event.target.ariaLabel,
+            width: 320,
+            height: 212,
+            aiDisclosure: "none",
+          });
+        },
+        previewUrl:
+          event.target.ariaLabel,
+        previewSize: {
+          width: 320,
+          height: 212,
+        },
+        fullSize: {
+          width: 320,
+          height: 212,
+        },
+      });
+    }
+
+    if (isSupported(ui.startDragToCursor)) {
+      ui.startDragToCursor(event, {
+        type: "image",
+        resolveImageRef: () => {
+          return upload({
+            mimeType: "image/png",
+            thumbnailUrl: event.target.ariaLabel,
+            type: "image",
+            url: event.target.ariaLabel,
+            width: 320,
+            height: 212,
+            aiDisclosure: "none",
+          });
+        },
+        previewUrl: event.target.ariaLabel,
+        previewSize: {
+          width: 320,
+          height: 212,
+        },
+        fullSize: {
+          width: 320,
+          height: 212,
+        },
+      });
+    }
+  }
+
   return (
     <div>
       <Rows spacing="1.5u">
@@ -178,90 +366,151 @@ const Agents = () => {
             )}
           </Menu>}
         </SearchInputMenu>
-        {/* {listingSearchState === "success" && selectedListing && ( */}
-        {(
-          <>
-            <TypographyCard
-              ariaLabel="Agent Name"
-              onClick={() => { onListingTextResultClick("Name", selectedListing.value) }}
-            >
-              <Text>
-                Name:<br />
-                {selectedListing.value.name}
-              </Text>
-            </TypographyCard>
-            <TypographyCard
-              ariaLabel="Agent Email"
-              onClick={() => { onListingTextResultClick("Email", selectedListing.value) }}
-            >
-              <Text>
-                Email:<br />
-                {selectedListing.value.emailAddress}
-              </Text>
-            </TypographyCard>
-            {/* <TypographyCard
-              ariaLabel="Mobile number local"
-              onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
-            >
-              <Text>
-                Mobile number (local):<br />
-                {selectedListing.value.phones[0].localNumber}
-              </Text>
-            </TypographyCard>
-            <TypographyCard
-              ariaLabel="Mobile number international"
-              onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
-            >
-              <Text>
-                Mobile number (international):<br />
-                {selectedListing.value.phones[0].internationalizedNumber}
-              </Text>
-            </TypographyCard>
-            <Title>Office details</Title>
-            {
-              selectedListing.value.organisations.map(item => (
-                <>
-                  <TypographyCard
-                    ariaLabel="Office name"
-                    onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
-                  >
-                    <Text>
-                      Office name:<br />
-                      {item.name}
-                    </Text>
-                  </TypographyCard>
-                  <TypographyCard
-                    ariaLabel="Office Title"
-                    onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
-                  >
-                    <Text>
-                      Title:<br />
-                      {item.title}
-                    </Text>
-                  </TypographyCard>
-                  <TypographyCard
-                    ariaLabel="Mobile number local"
-                    onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
-                  >
-                    <Text>
-                      Mobile number (local):<br />
-                      {item.phones[0].localNumber}
-                    </Text>
-                  </TypographyCard>
-                  <TypographyCard
-                    ariaLabel="Mobile number international"
-                    onClick={() => { onListingTextResultClick("Title", selectedListing.value) }}
-                  >
-                    <Text>
-                      Mobile number (international):<br />
-                      {item.phones[0].internationalizedNumber}
-                    </Text>
-                  </TypographyCard>
-                </>
-              ))
-            } */}
-          </>
+        {listingSearchState === "success" && selectedAgent && (
+          Object.hasOwn(selectedAgent, 'value') ?
+            <Rows spacing="1u">
+              <Carousel>
+                {
+                  selectedAgent.value.profile.photos.map((item) => (
+                    <EmbedCard
+                      key={item.fileName}
+                      ariaLabel={item.fileName}
+                      onDragStart={handleImageDragStart}
+                      onClick={() => {
+                        handleImageClick
+                        // handleClick(item.url)
+                        // addElementAtPoint({
+                        //   type: "embed",
+                        //   url: item.url,
+                        // });
+                      }}
+                      thumbnailUrl={item.fileName}
+                      thumbnailHeight={120}
+                    />
+                  ))
+                }
+              </Carousel>
+              <TypographyCard
+                ariaLabel={selectedAgent.value.name}
+                onDragStart={handleDragStartText}
+              >
+                <Text>
+                  Name:<br />
+                  {selectedAgent.value.name}
+                </Text>
+              </TypographyCard>
+              <TypographyCard
+                ariaLabel={selectedAgent.value.emailAddress}
+                onDragStart={handleDragStartText}
+              >
+                <Text>
+                  Email:<br />
+                  {selectedAgent.value.emailAddress}
+                </Text>
+              </TypographyCard>
+              {/* <TypographyCard
+                ariaLabel={selectedAgent.value.phones[0].localNumber}
+                onDragStart={handleDragStartText}
+              >
+                <Text>
+                  Mobile number (local):<br />
+                  {selectedAgent.value.phones[0].localNumber}
+                </Text>
+              </TypographyCard>
+              <TypographyCard
+                ariaLabel={selectedAgent.value.phones[0].internationalizedNumber}
+                onDragStart={handleDragStartText}
+              >
+                <Text>
+                  Mobile number (international):<br />
+                  {selectedAgent.value.phones[0].internationalizedNumber}
+                </Text>
+              </TypographyCard> */}
 
+              {
+                selectedAgent.value.currentRecognition ?
+                  <div>
+                    <Title
+                      alignment="start"
+                      capitalization="default"
+                      size="small"
+                    >
+                      Current recognition
+                    </Title>
+                    {
+                      selectedAgent.value.currentRecognition.map((item) => {
+                        return (
+                          <Accordion>
+                            <AccordionItem title={item.award}>
+                              <TypographyCard
+                                ariaLabel={item.award}
+                                onDragStart={handleDragStartText}
+                              >
+                                <Text>Award name: <br /> {item.award}</Text>
+                              </TypographyCard>
+                              <br />
+                              <br />
+                              <EmbedCard
+                                key={item.pictureUrl}
+                                ariaLabel={item.pictureUrl}
+                                onDragStart={handlePNGImageDragStart}
+                                onClick={() => {
+                                  handleImageClick
+                                  // handleClick(item.url)
+                                  // addElementAtPoint({
+                                  //   type: "embed",
+                                  //   url: item.url,
+                                  // });
+                                }}
+                                thumbnailUrl={item.pictureUrl}
+                                thumbnailAspectRatio={1.5}
+                              />
+                            </AccordionItem>
+                          </Accordion>
+                        )
+                      })
+                    }
+
+                  </div>
+                  :
+                  null
+              }
+
+              <Title>Office details</Title>
+              {
+                selectedAgent.value.organisations ?
+                  selectedAgent.value.organisations.map(item => (
+                    <>
+                      <Accordion>
+                        <AccordionItem title={item.name}>
+                          <TypographyCard
+                            ariaLabel={item.name}
+                            onDragStart={handleDragStartText}
+                          >
+                            <Text>
+                              Office name:<br />
+                              {item.name}
+                            </Text>
+                          </TypographyCard>
+                          <TypographyCard
+                            ariaLabel={item.title}
+                            onDragStart={handleDragStartText}
+                          >
+                            <Text>
+                              Title:<br />
+                              {item.title}
+                            </Text>
+                          </TypographyCard>
+                        </AccordionItem>
+                      </Accordion>
+                    </>
+                  ))
+                  :
+                  null
+              }
+            </Rows>
+            :
+            null
         )}
 
       </Rows>

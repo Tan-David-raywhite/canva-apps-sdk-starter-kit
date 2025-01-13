@@ -14,8 +14,10 @@ import {
 } from "@canva/app-ui-kit";
 import { auth } from "@canva/user";
 import { useState, useEffect } from "react";
-import { addElementAtPoint } from "@canva/design";
+import { addElementAtCursor, addElementAtPoint, ui } from "@canva/design";
 import { editContent } from "@canva/design";
+import { useFeatureSupport } from "utils/use_feature_support";
+import type { ImageDragConfig } from "@canva/design";
 import * as styles from "styles/components.css";
 import { upload } from "@canva/asset";
 
@@ -27,7 +29,10 @@ const BRANDTEMPLATEQUERY_URL = "https://api.canva.com/rest/v1/oauth/token";
 
 type State = "idle" | "loading" | "success" | "error";
 type ListingSearchState = "idle" | "loading" | "success" | "error";
+
+
 const Listings = () => {
+  const isSupported = useFeatureSupport();
   const [state, setState] = useState<State>("idle");
   const [brandQueryState, setBrandQUeryState] = useState<State>("idle");
   const [responseBody, setResponseBody] = useState<unknown | undefined>(
@@ -89,43 +94,7 @@ const Listings = () => {
   const [searchInputValue, setSearchInputValue] = useState<string>("");
   const [isSearchMenuOpen, setIsSearchMenuOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState({
-    value: {
-      id: 1,
-      links: [
-        {
-          code: "PRL",
-        },
-      ],
-      images: [
-        {
-          url: "https://cdn6.ep.dynamics.net/s3/rw-propertyimages/0060-H3148202-mydimport-1617794846-30255-005Open2viewID532131-16HarbordStreet.jpg",
-          width: 4724,
-          height: 3538,
-        },
-      ],
-      description: "This is a description",
-      address: {
-        streetNumber: "43",
-        streetName: "Cedarvale",
-        streetType: "Lane",
-        streetTypeCode: "LANE",
-        suburb: "Berry",
-        suburbId: 3176,
-        state: "New South Wales",
-        stateCode: "NSW",
-        country: "Australia",
-        countryCode: "AU",
-        postCode: "2535",
-        location: {
-          lat: -34.787002,
-          lon: 150.631467,
-        },
-        formatted: "43 Cedarvale Lane\nBerry  New South Wales  2535\nAustralia",
-      },
-      price: "1700000",
-      title: "This is and awesome listing",
-      type: "For Sale",
-    },
+
   });
   const [listingSearchState, setListingSearchState] =
     useState<ListingSearchState>("idle");
@@ -137,7 +106,7 @@ const Listings = () => {
   };
 
   useEffect(() => {
-    checkContent();
+    // checkContent();
   }, []);
 
   const checkContent = async () => {
@@ -237,7 +206,7 @@ const Listings = () => {
       const body = await res.json();
       setResponseBody(body.data);
       setListingMenuItems(body.data);
-      // console.log(body.data)
+      console.log(body.data)
       setListingSearchState("success");
     } catch (error) {
       setListingSearchState("loading");
@@ -265,16 +234,16 @@ const Listings = () => {
           type: "text",
           children: [
             data.address.streetNumber +
-              " " +
-              data.address.streetName +
-              " " +
-              data.address.streetType +
-              " " +
-              data.address.suburb +
-              " " +
-              data.address.state +
-              " " +
-              data.address.postCode,
+            " " +
+            data.address.streetName +
+            " " +
+            data.address.streetType +
+            " " +
+            data.address.suburb +
+            " " +
+            data.address.state +
+            " " +
+            data.address.postCode,
           ],
         });
         break;
@@ -301,21 +270,140 @@ const Listings = () => {
           type: "text",
           children: [
             data.streetNumber +
-              " " +
-              data.streetName +
-              " " +
-              data.streetType +
-              " " +
-              data.suburb +
-              " " +
-              data.state +
-              " " +
-              data.postCode,
+            " " +
+            data.streetName +
+            " " +
+            data.streetType +
+            " " +
+            data.suburb +
+            " " +
+            data.state +
+            " " +
+            data.postCode,
           ],
         });
       }
     }
   };
+
+  function handleDragStartText(event: React.DragEvent<HTMLElement>) {
+    if (isSupported(ui.startDragToPoint)) {
+      console.log(event)
+      ui.startDragToPoint(event, {
+        type: "text",
+        children: [event.target.ariaLabel],
+      });
+    }
+
+    if (isSupported(ui.startDragToCursor)) {
+      ui.startDragToCursor(event, {
+        type: "text",
+        children: [event.target.ariaLabel],
+      });
+    }
+  }
+
+  async function handleImageClick(event) {
+    if (isSupported(addElementAtPoint)) {
+      const asset = await upload({
+        mimeType: "image/jpeg",
+        thumbnailUrl:
+          event.target.ariaLabel,
+        type: "image",
+        url: event.target.ariaLabel,
+        width: 320,
+        height: 212,
+        aiDisclosure: "none",
+      });
+
+      addElementAtPoint({
+        type: "image",
+        ref: asset.ref,
+        altText: {
+          text: "Example grass image",
+          decorative: false
+        },
+      });
+    }
+
+    if (isSupported(addElementAtCursor)) {
+      const asset = await upload({
+        mimeType: "image/jpeg",
+        thumbnailUrl:
+          event.target.ariaLabel,
+        type: "image",
+        url: event.target.ariaLabel,
+        width: 320,
+        height: 212,
+        aiDisclosure: "none",
+      });
+
+      addElementAtCursor({
+        type: "image",
+        ref: asset.ref,
+        altText: {
+          text: "Example grass image",
+          decorative: false
+        },
+      });
+    }
+  }
+
+  function handleImageDragStart(event: React.DragEvent<HTMLElement>) {
+    if (isSupported(ui.startDragToPoint)) {
+      ui.startDragToPoint(event, {
+        type: "image",
+        resolveImageRef: () => {
+          return upload({
+            mimeType: "image/jpeg",
+            thumbnailUrl:
+              event.target.ariaLabel,
+            type: "image",
+            url: event.target.ariaLabel,
+            width: 320,
+            height: 212,
+            aiDisclosure: "none",
+          });
+        },
+        previewUrl:
+          event.target.ariaLabel,
+        previewSize: {
+          width: 320,
+          height: 212,
+        },
+        fullSize: {
+          width: 320,
+          height: 212,
+        },
+      });
+    }
+
+    if (isSupported(ui.startDragToCursor)) {
+      ui.startDragToCursor(event, {
+        type: "image",
+        resolveImageRef: () => {
+          return upload({
+            mimeType: "image/jpeg",
+            thumbnailUrl: event.target.ariaLabel,
+            type: "image",
+            url: event.target.ariaLabel,
+            width: 320,
+            height: 212,
+            aiDisclosure: "none",
+          });
+        },
+        previewUrl: event.target.ariaLabel,
+        previewSize: {
+          width: 320,
+          height: 212,
+        },
+        fullSize: {
+          width: 320,
+          height: 212,
+        },
+      });
+    }
+  }
 
   return (
     <div>
@@ -351,78 +439,126 @@ const Listings = () => {
       </Rows>
       <br />
       {listingSearchState === "success" && selectedListing && (
-        <Rows spacing="1u">
-          <Carousel>
-            {selectedListing.value.images.map((item) => (
-              <EmbedCard
-                key={item.url}
-                ariaLabel="Listing Image"
-                onClick={() => {
-                  // handleClick(item.url)
-                  addElementAtPoint({
-                    type: "embed",
-                    url: item.url,
-                  });
-                }}
-                thumbnailUrl={item.url}
-                thumbnailHeight={120}
-              />
-            ))}
-          </Carousel>
-          <TypographyCard
-            ariaLabel="Listing Title"
-            onClick={() => {
-              replaceContent(
-                "LISTING_TITLE",
-                selectedListing.value.title,
-              );
-            }}
-          >
-            <Text>
-              Title:
-              <br />
-              {selectedListing.value.title}
-            </Text>
-          </TypographyCard>
-          <TypographyCard
-            ariaLabel="Listing Address"
-            onClick={() => {
-              // onListingTextResultClick("Address", selectedListing.value);
-              replaceContent(
-                "LISTING_ADDRESS",
-                selectedListing.value.address.streetNumber +
-                  selectedListing.value.address.streetName +
-                  selectedListing.value.address.streetType +
-                  selectedListing.value.address.suburb +
-                  selectedListing.value.address.state +
-                  selectedListing.value.address.postCode,
-              );
-            }}
-          >
-            <Text>
-              Address:
-              <br />
-              {selectedListing.value.address.streetNumber}{" "}
-              {selectedListing.value.address.streetName}{" "}
-              {selectedListing.value.address.streetType}{" "}
-              {selectedListing.value.address.suburb}{" "}
-              {selectedListing.value.address.state}{" "}
-              {selectedListing.value.address.postCode}
-            </Text>
-          </TypographyCard>
-          <TypographyCard
-            ariaLabel="Listing Price"
-            onClick={() => {
-              replaceContent("LISTING_PRICE", "$" + selectedListing.value.price);
-            }}
-          >
-            <Text>
-              Price:
-              <br />
-              {selectedListing.value.price}
-            </Text>
-          </TypographyCard>
-        </Rows>
+
+        Object.hasOwn(selectedListing, 'value') ?
+          <Rows spacing="1u">
+            <Carousel>
+              {
+                selectedListing.value.images.map((item) => (
+                  <EmbedCard
+                    key={item.url}
+                    ariaLabel={item.url}
+                    onDragStart={handleImageDragStart}
+                    onClick={() => {
+                      handleImageClick
+                      // handleClick(item.url)
+                      // addElementAtPoint({
+                      //   type: "embed",
+                      //   url: item.url,
+                      // });
+                    }}
+                    thumbnailUrl={item.url}
+                    thumbnailHeight={120}
+                  />
+                ))
+              }
+            </Carousel>
+            <TypographyCard
+              ariaLabel={selectedListing.value.title}
+              onDragStart={handleDragStartText}
+            // onClick={() => {
+            //   replaceContent(
+            //     "LISTING_TITLE",
+            //     selectedListing.value.title,
+            //   );
+            // }}
+            >
+              <Text>
+                Title:
+                <br />
+                {selectedListing.value.title}
+              </Text>
+            </TypographyCard>
+            <TypographyCard
+              ariaLabel={selectedListing.value.address.streetNumber +
+                selectedListing.value.address.streetName +
+                selectedListing.value.address.streetType +
+                selectedListing.value.address.suburb +
+                selectedListing.value.address.state +
+                selectedListing.value.address.postCode}
+              onDragStart={handleDragStartText}
+            // onClick={() => {
+            //   // onListingTextResultClick("Address", selectedListing.value);
+            //   replaceContent(
+            //     "LISTING_ADDRESS",
+            //     selectedListing.value.address.streetNumber +
+            //     selectedListing.value.address.streetName +
+            //     selectedListing.value.address.streetType +
+            //     selectedListing.value.address.suburb +
+            //     selectedListing.value.address.state +
+            //     selectedListing.value.address.postCode,
+            //   );
+            // }}
+            >
+              <Text>
+                Address:
+                <br />
+                {selectedListing.value.address.streetNumber}{" "}
+                {selectedListing.value.address.streetName}{" "}
+                {selectedListing.value.address.streetType}{" "}
+                {selectedListing.value.address.suburb}{" "}
+                {selectedListing.value.address.state}{" "}
+                {selectedListing.value.address.postCode}
+              </Text>
+            </TypographyCard>
+            <TypographyCard
+              ariaLabel={selectedListing.value.price}
+              onDragStart={handleDragStartText}
+            // onClick={() => {
+            //   replaceContent("LISTING_PRICE", "$" + selectedListing.value.price);
+            // }}
+            >
+              <Text>
+                Price:
+                <br />
+                {selectedListing.value.price}
+              </Text>
+            </TypographyCard>
+            <TypographyCard
+              ariaLabel={selectedListing.value.bathrooms}
+              onDragStart={handleDragStartText}
+            >
+              <Text>
+                Bathrooms:
+                <br />
+                {selectedListing.value.bathrooms}
+              </Text>
+            </TypographyCard>
+
+            <TypographyCard
+              ariaLabel={selectedListing.value.bedrooms}
+              onDragStart={handleDragStartText}
+            >
+              <Text>
+                Bedrooms:
+                <br />
+                {selectedListing.value.bedrooms}
+              </Text>
+            </TypographyCard>
+
+            <TypographyCard
+              ariaLabel={selectedListing.value.carSpaces}
+              onDragStart={handleDragStartText}
+            >
+              <Text>
+                Car spaces:
+                <br />
+                {selectedListing.value.carSpaces}
+              </Text>
+            </TypographyCard>
+          </Rows>
+          :
+          null
       )}
     </div>
   );

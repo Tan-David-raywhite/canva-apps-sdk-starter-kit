@@ -6,6 +6,7 @@ import {
   EmbedCard,
   FormField,
   MultilineInput,
+  ImageCard,
   Menu,
   MenuItem,
   SearchInputMenu,
@@ -16,7 +17,9 @@ import {
 } from "@canva/app-ui-kit";
 import { auth } from "@canva/user";
 import { useState, useEffect } from "react";
-import { addElementAtPoint } from "@canva/design";
+import { addElementAtCursor, addElementAtPoint, ui } from "@canva/design";
+import { editContent } from "@canva/design";
+import { useFeatureSupport } from "utils/use_feature_support";
 import * as styles from "styles/components.css";
 import { upload } from "@canva/asset";
 import { useSelection } from "utils/use_selection_hook";
@@ -33,123 +36,18 @@ const getBrandTemplate_URL =
 type State = "idle" | "loading" | "success" | "error";
 type ListingSearchState = "idle" | "loading" | "success" | "error";
 
-const Agents = () => {
+const Offices = () => {
+  const isSupported = useFeatureSupport();
   const [state, setState] = useState<State>("idle");
   const [brandQueryState, setBrandQUeryState] = useState<State>("idle");
   const [responseBody, setResponseBody] = useState<unknown | undefined>(
     undefined,
   );
   const [agentMenuItems, setAgentMenuItems] = useState([
-    {
-      value: {
-        id: 1,
-        name: "name",
-        emailAddress: "email@email.com",
-        webSite: "http://raywhitedoublebay.com",
-        address: {
-          country: "Australia",
-          countryCode: "AU",
-          location: {
-            lat: -33.877683,
-            lon: 151.242768,
-          },
-          postCode: "2028",
-          state: "New South Wales",
-          stateCode: "NSW",
-          streetName: "New South Head Road",
-          streetNumber: "356",
-          suburb: "Double Bay",
-        },
-        profile: {
-          socialLinks: [
-            {
-              link: "https://www.facebook.com/raywhiteuppernorthshore",
-              type: "Facebook",
-            },
-            {
-              link: "https://g.page/r/CYCERWcoKCk9EAE",
-              type: "Google My Business",
-            },
-            {
-              link: "https://www.instagram.com/raywhitesouthbank/",
-              type: "Instagram",
-            },
-            {
-              link: "https://www.youtube.com/channel/UC_YOun04-z5jW09SRkYN1WA",
-              type: "Youtube Channel",
-            },
-          ],
-        },
-        phones: [
-          {
-            internationalizedNumber: "+61 (2) 9363 9999",
-            localNumber: "(02) 9363 9999",
-            typeCode: "FIX",
-          },
-          {
-            internationalizedNumber: "+61 (2) 9327 7717",
-            localNumber: "(02) 9327 7717",
-            typeCode: "FAX",
-          },
-        ],
-      },
-    },
   ]);
   const [searchInputValue, setSearchInputValue] = useState<string>("");
   const [isSearchMenuOpen, setIsSearchMenuOpen] = useState(false);
-  const [selectedListing, setSelectedListing] = useState({
-    value: {
-      id: 1,
-      name: "name",
-      emailAddress: "email@email.com",
-      webSite: "http://raywhitedoublebay.com",
-      address: {
-        country: "Australia",
-        countryCode: "AU",
-        location: {
-          lat: -33.877683,
-          lon: 151.242768,
-        },
-        postCode: "2028",
-        state: "New South Wales",
-        stateCode: "NSW",
-        streetName: "New South Head Road",
-        streetNumber: "356",
-        suburb: "Double Bay",
-      },
-      profile: {
-        socialLinks: [
-          {
-            link: "https://www.facebook.com/raywhiteuppernorthshore",
-            type: "Facebook",
-          },
-          {
-            link: "https://g.page/r/CYCERWcoKCk9EAE",
-            type: "Google My Business",
-          },
-          {
-            link: "https://www.instagram.com/raywhitesouthbank/",
-            type: "Instagram",
-          },
-          {
-            link: "https://www.youtube.com/channel/UC_YOun04-z5jW09SRkYN1WA",
-            type: "Youtube Channel",
-          },
-        ],
-      },
-      phones: [
-        {
-          internationalizedNumber: "+61 (2) 9363 9999",
-          localNumber: "(02) 9363 9999",
-          typeCode: "FIX",
-        },
-        {
-          internationalizedNumber: "+61 (2) 9327 7717",
-          localNumber: "(02) 9327 7717",
-          typeCode: "FAX",
-        },
-      ],
-    },
+  const [selectedOffices, setselectedOffices] = useState({
   });
   const [listingSearchState, setListingSearchState] =
     useState<ListingSearchState>("idle");
@@ -158,6 +56,7 @@ const Agents = () => {
   const headerTextStyle = {
     fontSize: "15px",
   };
+
   const onSearchInputClear = () => {
     setSearchInputValue("");
   };
@@ -168,48 +67,7 @@ const Agents = () => {
     // getBrandTemplate();
   }, []);
 
-  const getBrandTemplate = async () => {
-    const token = await auth.getCanvaUserToken();
-    fetch(getBrandTemplate_URL, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(async (response) => {
-        const data = await response.json();
-        console.log(data);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const searchDataset = async (data) => {
-    const token = await auth.getCanvaUserToken();
-    fetch("https://api.canva.com/rest/v1/autofills", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        brand_template_id: "DAGVAJt80ds",
-        title: "string",
-        data: {
-          Property_Address: {
-            type: "text",
-            text: data,
-          },
-        },
-      }),
-    })
-      .then(async (response) => {
-        const data = await response.json();
-        console.log(data);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const searchListings = async (label) => {
+  const searchOffices = async (label) => {
     try {
       setListingSearchState("loading");
       const token = await auth.getCanvaUserToken();
@@ -227,18 +85,17 @@ const Agents = () => {
       const body = await res.json();
       setResponseBody(body.data);
       setAgentMenuItems(body.data);
-      console.log(body.data);
+      // console.log(body.data);
       setListingSearchState("success");
     } catch (error) {
-      setListingSearchState("error");
+      setListingSearchState("loading");
       // eslint-disable-next-line no-console
       console.error(error);
     }
   };
 
   const onMenuItemClick = (item) => {
-    console.log(item);
-    setSelectedListing(item);
+    setselectedOffices(item);
     setIsSearchMenuOpen(false);
   };
 
@@ -262,16 +119,16 @@ const Agents = () => {
           type: "text",
           children: [
             data.address.streetNumber +
-              " " +
-              data.address.streetName +
-              " " +
-              data.address.streetType +
-              " " +
-              data.address.suburb +
-              " " +
-              data.address.state +
-              " " +
-              data.address.postCode,
+            " " +
+            data.address.streetName +
+            " " +
+            data.address.streetType +
+            " " +
+            data.address.suburb +
+            " " +
+            data.address.state +
+            " " +
+            data.address.postCode,
           ],
         });
         break;
@@ -292,28 +149,147 @@ const Agents = () => {
           type: "text",
           children: [
             data.address.streetNumber +
-              " " +
-              data.address.streetName +
-              " " +
-              data.address.streetType +
-              " " +
-              data.address.suburb +
-              " " +
-              data.address.state +
-              " " +
-              data.address.postCode,
+            " " +
+            data.address.streetName +
+            " " +
+            data.address.streetType +
+            " " +
+            data.address.suburb +
+            " " +
+            data.address.state +
+            " " +
+            data.address.postCode,
           ],
         });
       }
     }
   };
 
+  function handleDragStartText(event: React.DragEvent<HTMLElement>) {
+    if (isSupported(ui.startDragToPoint)) {
+      console.log(event)
+      ui.startDragToPoint(event, {
+        type: "text",
+        children: [event.target.ariaLabel],
+      });
+    }
+
+    if (isSupported(ui.startDragToCursor)) {
+      ui.startDragToCursor(event, {
+        type: "text",
+        children: [event.target.ariaLabel],
+      });
+    }
+  }
+
+  async function handleImageClick(event) {
+    if (isSupported(addElementAtPoint)) {
+      const asset = await upload({
+        mimeType: "image/png",
+        thumbnailUrl:
+          event.target.ariaLabel,
+        type: "image",
+        url: event.target.ariaLabel,
+        width: 320,
+        height: 212,
+        aiDisclosure: "none",
+      });
+
+      addElementAtPoint({
+        type: "image",
+        ref: asset.ref,
+        altText: {
+          text: "Example grass image",
+          decorative: false
+        },
+      });
+    }
+
+    if (isSupported(addElementAtCursor)) {
+      const asset = await upload({
+        mimeType: "image/png",
+        thumbnailUrl:
+          event.target.ariaLabel,
+        type: "image",
+        url: event.target.ariaLabel,
+        width: 320,
+        height: 212,
+        aiDisclosure: "none",
+      });
+
+      addElementAtCursor({
+        type: "image",
+        ref: asset.ref,
+        altText: {
+          text: "Example grass image",
+          decorative: false
+        },
+      });
+    }
+  }
+
+  function handleImageDragStart(event: React.DragEvent<HTMLElement>) {
+    if (isSupported(ui.startDragToPoint)) {
+      ui.startDragToPoint(event, {
+        type: "image",
+        resolveImageRef: () => {
+          return upload({
+            mimeType: "image/png",
+            thumbnailUrl:
+              event.target.ariaLabel,
+            type: "image",
+            url: event.target.ariaLabel,
+            width: 320,
+            height: 212,
+            aiDisclosure: "none",
+          });
+        },
+        previewUrl:
+          event.target.ariaLabel,
+        previewSize: {
+          width: 320,
+          height: 212,
+        },
+        fullSize: {
+          width: 320,
+          height: 212,
+        },
+      });
+    }
+
+    if (isSupported(ui.startDragToCursor)) {
+      ui.startDragToCursor(event, {
+        type: "image",
+        resolveImageRef: () => {
+          return upload({
+            mimeType: "image/png",
+            thumbnailUrl: event.target.ariaLabel,
+            type: "image",
+            url: event.target.ariaLabel,
+            width: 320,
+            height: 212,
+            aiDisclosure: "none",
+          });
+        },
+        previewUrl: event.target.ariaLabel,
+        previewSize: {
+          width: 320,
+          height: 212,
+        },
+        fullSize: {
+          width: 320,
+          height: 212,
+        },
+      });
+    }
+  }
+
   return (
     <div>
       <Rows spacing="2u">
         <SearchInputMenu
           placeholder="Search Office..."
-          onChange={(value) => searchListings(value)}
+          onChange={(value) => searchOffices(value)}
           onFocus={() => setIsSearchMenuOpen(true)}
           onClear={onSearchInputClear}
         >
@@ -330,78 +306,114 @@ const Agents = () => {
             </Menu>
           )}
         </SearchInputMenu>
-        {listingSearchState === "success" && selectedListing && (
-          <Rows spacing="2u">
-            <Title>{selectedListing.value.name}</Title>
-            <Accordion>
-              <AccordionItem title="Office name">
-                <TypographyCard
-                  ariaLabel="Office name"
-                  onClick={() => {
-                    onListingTextResultClick("Name", selectedListing.value);
-                  }}
-                >
-                  <Text>{selectedListing.value.name}</Text>
-                </TypographyCard>
-              </AccordionItem>
+        {listingSearchState === "success" && selectedOffices && (
 
-              <AccordionItem title="Office email">
-                <TypographyCard
-                  ariaLabel="Office email"
-                  onClick={() => {
-                    onListingTextResultClick("email", selectedListing.value);
-                  }}
-                >
-                  <Text>{selectedListing.value.emailAddress}</Text>
-                </TypographyCard>
-              </AccordionItem>
-              <AccordionItem title="Office address">
-                <TypographyCard
-                  ariaLabel="Office address"
-                  onClick={() => {
-                    onListingTextResultClick("address", selectedListing.value);
-                  }}
-                >
-                  <Text>
-                    {selectedListing.value.address.streetNumber}{" "}
-                    {selectedListing.value.address.streetName},{" "}
-                    {selectedListing.value.address.suburb},{" "}
-                    {selectedListing.value.address.state}{" "}
-                    {selectedListing.value.address.postCode}
-                  </Text>
-                </TypographyCard>
-              </AccordionItem>
-              <AccordionItem title="Office socials">
-                {selectedListing.value.profile.socialLinks
-                  ? selectedListing.value.profile.socialLinks.map((item) => (
-                      <TypographyCard
-                        ariaLabel="Office socials"
-                        onClick={() => {
-                          onListingTextResultClick("socials", item);
-                        }}
-                      >
-                        <Text>{item.type}:</Text>
-                        <Text>{item.link}</Text>
-                      </TypographyCard>
-                    ))
-                  : null}
-              </AccordionItem>
-              <AccordionItem title="Office website">
-                <TypographyCard
-                  ariaLabel="Office website"
-                  onClick={() => {
-                    onListingTextResultClick("website", selectedListing.value);
-                  }}
-                >
-                  <Text>{selectedListing.value.webSite}</Text>
-                </TypographyCard>
-              </AccordionItem>
-            </Accordion>
-          </Rows>
+          Object.hasOwn(selectedOffices, 'value') ?
+            <Rows spacing="2u">
+              <TypographyCard
+                ariaLabel={selectedOffices.value.name}
+                onDragStart={handleDragStartText}
+              >
+                <Text>Name: <br />{selectedOffices.value.name}</Text>
+              </TypographyCard>
+              <TypographyCard
+                ariaLabel={selectedOffices.value.emailAddress}
+                onDragStart={handleDragStartText}
+              >
+                <Text>Email <br /> {selectedOffices.value.emailAddress}</Text>
+              </TypographyCard>
+              <TypographyCard
+                ariaLabel={selectedOffices.value.address.streetNumber +
+                  selectedOffices.value.address.streetName +
+                  selectedOffices.value.address.streetType +
+                  selectedOffices.value.address.suburb +
+                  selectedOffices.value.address.state +
+                  selectedOffices.value.address.postCode}
+                onDragStart={handleDragStartText}
+              >
+                <Text>
+                  Address <br />
+                  {selectedOffices.value.address.streetNumber}{" "}
+                  {selectedOffices.value.address.streetName},{" "}
+                  {selectedOffices.value.address.suburb},{" "}
+                  {selectedOffices.value.address.state}{" "}
+                  {selectedOffices.value.address.postCode}
+                </Text>
+              </TypographyCard>
+              {selectedOffices.value.profile.socialLinks
+                ? selectedOffices.value.profile.socialLinks.map((item) => (
+                  <TypographyCard
+                    ariaLabel={item.link}
+                    onDragStart={handleDragStartText}
+                  >
+                    <Text>{item.type}:</Text>
+                    <Text>{item.link}</Text>
+                  </TypographyCard>
+                ))
+                : null}
+              <TypographyCard
+                ariaLabel={selectedOffices.value.webSite}
+                onDragStart={handleDragStartText}
+              >
+                <Text>Website <br /> {selectedOffices.value.webSite}</Text>
+              </TypographyCard>
+
+              {
+                selectedOffices.value.currentRecognition ?
+                  <div>
+                    <Title
+                      alignment="start"
+                      capitalization="default"
+                      size="small"
+                    >
+                      Current recognition
+                    </Title>
+                    {
+                      selectedOffices.value.currentRecognition.map((item) => {
+                        return (
+                          <Accordion>
+                            <AccordionItem title={item.award}>
+                              <TypographyCard
+                                ariaLabel={item.award}
+                                onDragStart={handleDragStartText}
+                              >
+                                <Text>Award name: <br /> {item.award}</Text>
+                              </TypographyCard>
+                              <br />
+                              <br />
+                              <EmbedCard
+                                key={item.pictureUrl}
+                                ariaLabel={item.pictureUrl}
+                                onDragStart={handleImageDragStart}
+                                onClick={() => {
+                                  handleImageClick
+                                  // handleClick(item.url)
+                                  // addElementAtPoint({
+                                  //   type: "embed",
+                                  //   url: item.url,
+                                  // });
+                                }}
+                                thumbnailUrl={item.pictureUrl}
+                                thumbnailAspectRatio={1.5}
+                              />
+                            </AccordionItem>
+                          </Accordion>
+                        )
+                      })
+                    }
+
+                  </div>
+                  :
+                  null
+              }
+            </Rows>
+            :
+            null
         )}
-      </Rows>
-    </div>
+      </Rows >
+    </div >
   );
 };
 
-export default Agents;
+export default Offices;
+
