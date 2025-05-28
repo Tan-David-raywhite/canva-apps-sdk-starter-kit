@@ -1,5 +1,92 @@
 # Changelog
 
+## 2025-05-19
+
+### 🧰 Added
+
+- Added `examples/data_connector_intent` as a basic implementation of the data connector intent.
+
+## 2025-04-30
+
+### 🔧 Changed
+
+- Upgraded `@canva/app-ui-kit` to version `4.9.0` Please see the [changelog](https://www.canva.dev/docs/apps/app-ui-kit/changelog/) for the list of changes.
+- Updated `eslint`, `eslint-plugin-unicorn`, and `typescript-eslint`.
+- Updated `@canva/app-eslint-plugin` to `1.0.0-beta.3`
+- `examples/digital_asset_management`:
+  - Upgraded `@canva/app-components` to version `1.3.0`. Please see the [changelog](https://www.canva.dev/docs/apps/app-components/changelog/) for the list of changes.
+  - Reinforce i18n eslint rules on `digital_asset_management` app example.
+- Upgraded `@canva/asset` to version `2.2.0` from `2.1.0`
+  - Now supporting `video/x-msvideo` as an allowed MIME type
+- Updated `@canva/design` to version `2.4.1` from `2.4.0` to fix a bug affecting unit tests without mocks.
+
+## 2025-03-24
+
+### 🧰 Added
+
+- Added the newly created `@canva/app-eslint-plugin` [library](https://www.npmjs.com/package/@canva/app-eslint-plugin).
+
+### 🗑️ Removed
+
+- Removed local eslint configs and rules in favour of `@canva/app-eslint-plugin`.
+
+## 2025-02-20
+
+### 🧰 Added
+
+- Added functionality to the start script:
+  - the `preview` flag controls launching the app preview in Canva. Use `npm run start:preview` to automatically open the `PreviewUrl` when you start your app.
+  - the `override-frontend-port` can specify the port number that the frontend server runs on, overriding the `.env` file config.
+  - `scripts/start/tests/start.tests.ts` tests that the script launches correctly
+- `@canva/design`:
+  - Latest version of the App Element API is out of preview and Generally Available. This version enables atomic and predictable operations that are no longer tied current selection. To learn more, see [App Elements](https://www.canva.dev/docs/apps/creating-app-elements/).
+- `examples`
+  - Updated all example apps that use app element API to use the latest version:
+    - `examples/app_element_children`
+    - `examples/app_embed_elements`
+    - `examples/app_image_elements`
+    - `examples/app_shape_elements`
+    - `examples/app_text_elements`
+    - `examples/app_video_elements`
+    - `examples/positioning_elements`
+  - Removed `examples/beta_app_image_elements` as the updated App Element API is now Generally Available and `examples/app_image_elements` has been updated to use the latest API.
+
+### 🔧 Changed
+
+- Upgraded `@canva/app-ui-kit` to version `4.8.0` Please see the [changelog](https://www.canva.dev/docs/apps/app-ui-kit/changelog/) for the list of changes.
+
+## 2025-02-05
+
+### 🔧 Changed
+
+- Upgraded `@canva/app-ui-kit` to version `4.7.1` Please see the [changelog](https://www.canva.dev/docs/apps/app-ui-kit/changelog/) for the list of changes.
+- Introduced a new `eslint` rule to prevent using `localStorage` or `sessionStorage` for storing keys or other sensitive information. If these APIs are used for non-sensitive data, the rule can be ignored using an eslint-disable comment.
+
+## 2025-01-22
+
+### 🔧 Changed
+
+- Upgraded `@canva/app-ui-kit` to version `4.7.0` Please see the [changelog](https://www.canva.dev/docs/apps/app-ui-kit/changelog/) for the list of changes.
+- Moved `webpack.config.cjs` to `webpack.config.ts` for type checking.
+- Updated file name casing to be consistent, and added an elint rule to enforce this
+- Dependencies audit bringing modules up to date:
+
+```text
+  @eslint/js                                9.16.0   →   9.18.0
+  @formatjs/cli                             6.3.14   →   6.3.15
+  @formatjs/ts-transformer                 3.13.26   →  3.13.27
+  @typescript-eslint/eslint-plugin          8.18.0   →   8.20.0
+  @typescript-eslint/parser                 8.18.0   →   8.20.0
+  eslint                                    9.16.0   →   9.18.0
+  eslint-plugin-formatjs                     5.2.8   →    5.2.9
+  eslint-plugin-jest                        28.9.0   →  28.11.0
+  eslint-plugin-react                       7.37.2   →   7.37.4
+  globals                                  15.13.0   →  15.14.0
+  terser-webpack-plugin                     5.3.10   →   5.3.11
+  ts-loader                                  9.5.1   →    9.5.2
+  webpack-dev-server                         5.1.0   →    5.2.0
+```
+
 ## 2024-12-19
 
 ### 🎁 [Developer Christmas](https://community.canva.dev/t/developer-christmas-2024/5492)
