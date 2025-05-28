@@ -1,62 +1,68 @@
-import { Button, Rows, Text } from "@canva/app-ui-kit";
-import { requestOpenExternalUrl } from "@canva/platform";
-import { FormattedMessage, useIntl } from "react-intl";
+import {
+  Button,
+  Carousel,
+  EmbedCard,
+  FormField,
+  MultilineInput,
+  Menu,
+  MenuItem,
+  SearchInputMenu,
+  Rows,
+  Tab,
+  Tabs,
+  TabList,
+  TabPanels,
+  TabPanel,
+  Text,
+  Title,
+  TypographyCard,
+} from "@canva/app-ui-kit";
+import { auth } from "@canva/user";
+import { useState } from "react";
 import * as styles from "styles/components.css";
-import { useAddElement } from "utils/use_add_element";
 
-export const DOCS_URL = "https://www.canva.dev/docs/apps/";
+import Listings from "./listings";
+import Agents from "./agents";
+import Offices from "./offices";
+
+// const BACKEND_URL = `${BACKEND_HOST}/custom-route`;
+const BACKEND_URL =
+  "https://raywhiteapi.ep.dynamics.net/v1/listings/?apiKey=df83a96e-0f55-4a20-82d9-eaa5f3e30335";
+// const BRANDTEMPLATEQUERY_URL = "https://api.canva.com/rest/v1/brand-templates/DAGQT21WyzM/dataset";
+const BRANDTEMPLATEQUERY_URL = "https://api.canva.com/rest/v1/oauth/token";
+
+type State = "idle" | "loading" | "success" | "error";
+type ListingSearchState = "idle" | "loading" | "success" | "error";
 
 export const App = () => {
-  const addElement = useAddElement();
-  const onClick = () => {
-    addElement({
-      type: "text",
-      children: ["Hello world!"],
-    });
-  };
-
-  const openExternalUrl = async (url: string) => {
-    const response = await requestOpenExternalUrl({
-      url,
-    });
-
-    if (response.status === "aborted") {
-      // user decided not to navigate to the link
-    }
-  };
-
-  const intl = useIntl();
+  const [state, setState] = useState<State>("idle");
+  const [brandQueryState, setBrandQUeryState] = useState<State>("idle");
+  const [responseBody, setResponseBody] = useState<unknown | undefined>(
+    undefined,
+  );
 
   return (
     <div className={styles.scrollContainer}>
-      <Rows spacing="2u">
-        <Text>
-          <FormattedMessage
-            defaultMessage="
-              To make changes to this app, edit the <code>src/app.tsx</code> file,
-              then close and reopen the app in the editor to preview the changes.
-            "
-            description="Instructions for how to make changes to the app. Do not translate <code>src/app.tsx</code>."
-            values={{
-              code: (chunks) => <code>{chunks}</code>,
-            }}
-          />
-        </Text>
-        <Button variant="primary" onClick={onClick} stretch>
-          {intl.formatMessage({
-            defaultMessage: "Do something cool",
-            description:
-              "Button text to do something cool. Creates a new text element when pressed.",
-          })}
-        </Button>
-        <Button variant="secondary" onClick={() => openExternalUrl(DOCS_URL)}>
-          {intl.formatMessage({
-            defaultMessage: "Open Canva Apps SDK docs",
-            description:
-              "Button text to open Canva Apps SDK docs. Opens an external URL when pressed.",
-          })}
-        </Button>
-      </Rows>
+      <Tabs>
+        <Rows spacing="3u">
+          <TabList>
+            <Tab id="Listings">Listings</Tab>
+            <Tab id="Offices">Offices</Tab>
+            <Tab id="Agents">Agents</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel id="Offices">
+              <Offices />
+            </TabPanel>
+            <TabPanel id="Agents">
+              <Agents />
+            </TabPanel>
+            <TabPanel id="Listings">
+              <Listings />
+            </TabPanel>
+          </TabPanels>
+        </Rows>
+      </Tabs>
     </div>
   );
 };
